@@ -1,6 +1,6 @@
 from utils import logger_factory
 
-class rlbrain_db_interface:
+class RLBrainDBInterface:
     """
     Interface for creating and interacting with
     an rl-brain database

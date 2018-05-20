@@ -1,7 +1,7 @@
-from .rlbrain_db_interface import rlbrain_db_interface
+from .rlbrain_db_interface import RLBrainDBInterface
 from os.path import isfile, getsize, abspath
 
-class rlbrain_sqlite(rlbrain_db_interface):
+class RLBrainSqliteDB(RLBrainDBInterface):
 
     def _is_sqlite3(self, path):
         """

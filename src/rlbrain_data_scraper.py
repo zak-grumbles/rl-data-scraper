@@ -5,6 +5,11 @@ import sys
 from utils import logger_factory
 
 def init_logging(verbose):
+    """
+    Sets up the basic logging configuration and gets a logger for this module
+
+    :return new Logger object for this module
+    """
     log_format = '%(asctime)s %(name)s:%(levelname)s - %(message)s'
 
     logging.basicConfig(format=log_format, filename='rlbrain_data_scraper.log')
@@ -13,6 +18,7 @@ def init_logging(verbose):
         return logger_factory.make_logger(__name__, logging.DEBUG)
     else:
         return logger_factory.make_logger(__name__)
+
 
 def get_database(db_type):
     """
@@ -23,15 +29,22 @@ def get_database(db_type):
     """
     repo = None
     if db_type == 'sqlite':
-        from db import rlbrain_sqlite
+        from db.interfaces import RLBrainSqliteDB
 
         db_path = input('SQLite DB path: ')
-        repo = rlbrain_sqlite.rlbrain_sqlite(db_path)
+        repo = RLBrainSqliteDB(db_path)
 
     return repo
 
 
 def run(args):
+    """
+    Runs the data scraper. Calls various apis and saves data out to the
+    database.
+
+    :param args: argparse Namespace containing command-line arguments
+    :return None
+    """
     init_logging(args.verbose)
     logger = logging.getLogger(__name__)
     logger.info('Starting...')
@@ -55,7 +68,7 @@ def parse_arguments():
         help='Number of matches to scrape.')
     parser.add_argument('-db', '--database', metavar='DBType', type=str,
         default='sqlite', help='Type of database to use.')
-    parser.add_argument('-v', '--verbose', action='store_true',
+    parser.add_argument('-v', '--verbose', action='store_true', default=False,
         help='Enable verbose logging to the console.')
     
     return parser.parse_args()
@@ -69,6 +82,7 @@ def main():
     """
     args = parse_arguments()
     run(args)
+
 
 if __name__ == '__main__':
     main()

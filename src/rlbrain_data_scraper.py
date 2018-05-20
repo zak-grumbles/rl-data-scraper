@@ -51,8 +51,8 @@ def run(args):
 
     try:
         repo = get_database(args.database)
-    except ValueError as value_err:
-        print(str(value_err) + ' Exiting.')
+    except:
+        print('Exception encountered. Terminating early.')
         logger.info('Exception encountered. Terminating early.')
         sys.exit()
 

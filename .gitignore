@@ -102,3 +102,12 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# log ignore
+*.log
+
+# database ignore
+sqlite/
+
+# vscode
+.vscode/

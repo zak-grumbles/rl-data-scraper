@@ -11,10 +11,10 @@ class rlbrain_db_interface:
     def save_match(self, match):
         raise NotImplementedError('\'save_match\' method not implemented')
 
-    def __init_logger(self):
+    def _init_logger(self):
         """
         Initializes the logger for this module
 
         :return None
         """
-        self.__logger = logger_factory.make_logger(__name__)
+        self._logger = logger_factory.make_logger(__name__)

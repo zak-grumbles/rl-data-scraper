@@ -111,3 +111,6 @@ sqlite/
 
 # vscode
 .vscode/
+
+# PyCharm
+.idea/

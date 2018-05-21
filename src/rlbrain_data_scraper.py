@@ -1,8 +1,8 @@
 import logging
 import argparse
-import sys
 
 from utils import logger_factory
+
 
 def init_logging(verbose):
     """
@@ -10,9 +10,14 @@ def init_logging(verbose):
 
     :return new Logger object for this module
     """
+    from os import path, makedirs
+
+    if not path.exists('../logs'):
+        makedirs('../logs')
+
     log_format = '%(asctime)s %(name)s:%(levelname)s - %(message)s'
 
-    logging.basicConfig(format=log_format, filename='rlbrain_data_scraper.log')
+    logging.basicConfig(format=log_format, filename='../logs/rlbrain_data_scraper.log')
 
     if verbose is True:
         return logger_factory.make_logger(__name__, logging.DEBUG)
@@ -49,12 +54,7 @@ def run(args):
     logger = logging.getLogger(__name__)
     logger.info('Starting...')
 
-    try:
-        repo = get_database(args.database)
-    except:
-        print('Exception encountered. Terminating early.')
-        logger.info('Exception encountered. Terminating early.')
-        sys.exit()
+    repo = get_database(args.database)
 
 
 def parse_arguments():
@@ -65,12 +65,12 @@ def parse_arguments():
     """
     parser = argparse.ArgumentParser(description='Data scraper for rl-brain')
     parser.add_argument('-n', '--num_matches', metavar='NumberOfMatches', type=int,
-        help='Number of matches to scrape.')
+                        help='Number of matches to scrape.')
     parser.add_argument('-db', '--database', metavar='DBType', type=str,
-        default='sqlite', help='Type of database to use.')
+                        default='sqlite', help='Type of database to use.')
     parser.add_argument('-v', '--verbose', action='store_true', default=False,
-        help='Enable verbose logging to the console.')
-    
+                        help='Enable verbose logging to the console.')
+
     return parser.parse_args()
 
 

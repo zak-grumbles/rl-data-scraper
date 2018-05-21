@@ -4,6 +4,8 @@ A set of interfaces used for interacting with rl-brain databases.
 """
 
 from utils import logger_factory
+import sqlite3
+
 
 class RLBrainDBInterface:
     """Interaface definition for rl-brain databases
@@ -11,6 +13,7 @@ class RLBrainDBInterface:
     Interface for creating and interacting with
     an rl-brain database
     """
+
     def save_player(self, player):
         raise NotImplementedError('\'save_player\' method not implemented')
 
@@ -32,25 +35,38 @@ class RLBrainSqliteDB(RLBrainDBInterface):
     Interface for interacting/creating an sqlite3 rl-brain database
     """
 
-    def _is_sqlite3(self, path):
-        """Check if a given file is an sqlite3 database
+    def _create_tables(self):
+        query = '''SELECT name
+            FROM sqlite_master
+            WHERE type='table'
+            AND name=\'{}\';'''
 
-        Checks if the file at the given path is an sqlite3 database.
-        Assumes the file exists.
+        self._cursor.execute(query.format('players'))
+        names = self._cursor.fetchall()
+        if len(names) == 0:
+            from .queries import CREATE_PLAYERS_TABLE
+            self._logger.info('players table not found. Creating...')
+            self._cursor.execute(CREATE_PLAYERS_TABLE)
+        else:
+            self._logger.info('players table found.')
 
-        :param path: Path to the file.
-        :return True if an sqlite3 db, False otherwise
-        """
-        from os.path import getsize
+        self._cursor.execute(query.format('matches'))
+        names = self._cursor.fetchall()
+        if len(names) == 0:
+            from .queries import CREATE_MATCHES_TABLE
+            self._logger.info('matches table not found. Creating...')
+            self._cursor.execute(CREATE_MATCHES_TABLE)
+        else:
+            self._logger.info('matches table found.')
 
-        if getsize(path) < 100: # SQLite header is 100 bytes
-            return False
-
-        with open(path, 'rb') as fd:
-            header = fd.read(100)
-
-        return header[:16] == 'SQLite format 3\x00'
-
+        self._cursor.execute(query.format('teams'))
+        names = self._cursor.fetchall()
+        if len(names) == 0:
+            from .queries import CREATE_TEAMS_TABLE_SQLITE
+            self._logger.info('teams table not found. Creating...')
+            self._cursor.execute(CREATE_TEAMS_TABLE_SQLITE)
+        else:
+            self._logger.info('teams table found.')
 
     def _init_db(self):
         """Initialize the database
@@ -59,15 +75,10 @@ class RLBrainSqliteDB(RLBrainDBInterface):
 
         :return None
         """
-        from os.path import isfile, abspath
 
-        if isfile(self._db_path):
-            if not self._is_sqlite3(self._db_path):
-                err = 'File "{}" exists but is not an sqlite database.'.format(
-                    abspath(self._db_path))
-                self._logger.error(err)
-                raise ValueError(err)
-
+        self._conn = sqlite3.connect(self._db_path)
+        self._cursor = self._conn.cursor()
+        self._create_tables()
 
     def __init__(self, db_path):
         """Constructor

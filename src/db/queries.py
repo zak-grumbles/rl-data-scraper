@@ -1,6 +1,6 @@
 
 CREATE_PLAYERS_TABLE = '''CREATE TABLE players
-    (id varchar(50) PRIMARY KEY, name varchar(150), platform INT, wins INT, goals INT,
+    (id varchar(50) PRIMARY KEY, platform INT, wins INT, goals INT,
     mvps INT, saves INT, shots INT, assists INT);'''
 
 CREATE_MATCHES_TABLE = '''CREATE TABLE matches

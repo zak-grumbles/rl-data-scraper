@@ -3,7 +3,7 @@
 A set of interfaces used for interacting with rl-brain databases.
 """
 
-from utils import logger_factory
+from ..utils import logger_factory
 import sqlite3
 
 
@@ -20,6 +20,9 @@ class RLBrainDBInterface:
     def save_match(self, match):
         raise NotImplementedError('\'save_match\' method not implemented')
 
+    def save_team(self, match):
+        raise NotImplementedError('\'save_match\' method not implemented')
+
     def _init_logger(self):
         """
         Initializes the logger for this module
@@ -34,6 +37,15 @@ class RLBrainSqliteDB(RLBrainDBInterface):
 
     Interface for interacting/creating an sqlite3 rl-brain database
     """
+
+    def save_player(self, player):
+        pass
+
+    def save_match(self, match):
+        pass
+
+    def save_team(self, team):
+        pass
 
     def _create_tables(self):
         query = '''SELECT name

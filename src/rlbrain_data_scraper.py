@@ -1,7 +1,7 @@
 import logging
 import argparse
 
-from utils import logger_factory
+from .utils import logger_factory
 
 
 def init_logging(verbose):
@@ -34,7 +34,7 @@ def get_database(db_type):
     """
     repo = None
     if db_type == 'sqlite':
-        from db.interfaces import RLBrainSqliteDB
+        from .db.interfaces import RLBrainSqliteDB
 
         db_path = input('SQLite DB path: ')
         repo = RLBrainSqliteDB(db_path)

@@ -3,7 +3,6 @@
 A set of interfaces used for interacting with rl-brain databases.
 """
 
-from ..utils import logger_factory
 from . import models
 
 from sqlalchemy import create_engine
@@ -11,7 +10,7 @@ from sqlalchemy.orm import sessionmaker, session
 
 
 class RLBrainDBInterface:
-    """Interaface definition for rl-brain databases
+    """Interface definition for rl-brain databases
 
     Interface for creating and interacting with
     an rl-brain database
@@ -35,7 +34,7 @@ class RLBrainDBInterface:
 
         :return None
         """
-        self._logger = logger_factory.make_logger(__name__)
+        #self._logger = logger_factory.make_logger(__name__)
 
     def __init__(self):
         self._db_session_maker = sessionmaker(bind=self._db_engine)

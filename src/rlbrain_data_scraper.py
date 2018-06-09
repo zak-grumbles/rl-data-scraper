@@ -1,7 +1,8 @@
 import logging
 import argparse
 
-from .utils import logger_factory
+from utils import logger_factory
+from apis import replays
 
 
 def init_logging(verbose):
@@ -34,7 +35,7 @@ def get_database(db_type):
     """
     repo = None
     if db_type == 'sqlite':
-        from .db.interfaces import RLBrainSqliteDB
+        from db.interfaces import RLBrainSqliteDB
 
         db_path = input('SQLite DB path: ')
         repo = RLBrainSqliteDB(db_path)
@@ -55,6 +56,37 @@ def run(args):
     logger.info('Starting...')
 
     repo = get_database(args.database)
+
+    matches = replays.get_replays(7100)
+
+    for match in matches:
+        from db.models import Match, Player, Team
+
+        players = match['player_set']
+
+        if len(players) is not 6:
+            continue
+
+        team_0 = []
+        team_1 = []
+
+        for player in players:
+            new_player = Player(player)
+
+            if new_player.team == 0:
+                team_0.append(new_player)
+            else:
+                team_1.append(new_player)
+
+            db_team_0 = Team(team_0)
+            db_team_1 = Team(team_1)
+
+            repo.save_team(db_team_0)
+            repo.save_team(db_team_1)
+
+            repo.save_player(new_player)
+
+
 
 
 def parse_arguments():

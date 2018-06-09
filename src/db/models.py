@@ -38,6 +38,14 @@ class Player(Base):
     shots = Column(Integer)
     assists = Column(Integer)
 
+    def __init__(self, json_data):
+        self.id = json_data['id']
+
+        # not mapped
+        self.team = json_data['team']
+
+        self.platform = int(json_data['platform'])
+
 
 class Team(Base):
     """
@@ -53,3 +61,11 @@ class Team(Base):
     player_2 = relationship('Player', foreign_keys=[player_2_id])
     player_3 = relationship('Player', foreign_keys=[player_3_id])
 
+    def __init__(self, team_array):
+        from uuid import uuid4
+
+        self.id = uuid4()
+
+        self.player_1_id = team_array[0].id
+        self.player_2_id = team_array[1].id
+        self.player_3_id = team_array[2].id

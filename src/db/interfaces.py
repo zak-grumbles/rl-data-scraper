@@ -6,7 +6,7 @@ A set of interfaces used for interacting with rl-brain databases.
 from . import models
 
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, session
+from sqlalchemy.orm import sessionmaker
 
 
 class RLBrainDBInterface:
@@ -37,8 +37,8 @@ class RLBrainDBInterface:
         #self._logger = logger_factory.make_logger(__name__)
 
     def __init__(self):
-        self._db_session_maker = sessionmaker(bind=self._db_engine)
-        self._db_session = session.DBSession()
+        self._db_session_class = sessionmaker(bind=self._engine)
+        self._db_session = self._db_session_class()
 
 
 class RLBrainSqliteDB(RLBrainDBInterface):
@@ -50,8 +50,7 @@ class RLBrainSqliteDB(RLBrainDBInterface):
     def __init__(self, db_path):
         """Constructor
 
-        Creates a new sqlite database if one is not found at db_path.
-        The db schema is then applied by _init_db
+        Sets up a connection to an sqlite3 database via SQLAlchemy.
 
         :param db_path: Path to the existing/desired sqlite database
         :return None
@@ -60,3 +59,4 @@ class RLBrainSqliteDB(RLBrainDBInterface):
         self._db_path = db_path
         self._engine = create_engine(f'sqlite:///{self._db_path}')
         models.Base.metadata.create_all(self._engine)
+        super(RLBrainSqliteDB, self).__init__()

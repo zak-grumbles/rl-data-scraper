@@ -114,3 +114,6 @@ sqlite/
 
 # PyCharm
 .idea/
+
+# config
+*.config

@@ -3,7 +3,7 @@
     Contains definitions for database models
 """
 
-from sqlalchemy import Column, ForeignKey, Integer
+from sqlalchemy import Column, ForeignKey, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
@@ -35,6 +35,7 @@ class Player(Base):
     wins = Column(Integer)
     goals = Column(Integer)
     mvps = Column(Integer)
+    saves = Column(Integer)
     shots = Column(Integer)
     assists = Column(Integer)
 
@@ -43,8 +44,20 @@ class Player(Base):
 
         # not mapped
         self.team = json_data['team']
+        if json_data['platform'] == '1':
+            self.online_id = json_data['online_id']
+        else:
+            self.online_id = json_data['player_name']
 
         self.platform = int(json_data['platform'])
+
+    def update_stats(self, stats):
+        self.wins = stats['wins']
+        self.goals = stats['goals']
+        self.mvps = stats['mvps']
+        self.saves = stats['saves']
+        self.shots = stats['shots']
+        self.assists = stats['assists']
 
 
 class Team(Base):
@@ -53,7 +66,7 @@ class Team(Base):
     """
     __tablename__ = 'teams'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(String(32), primary_key=True)
     player_1_id = Column(Integer, ForeignKey('players.id'), nullable=False)
     player_2_id = Column(Integer, ForeignKey('players.id'), nullable=False)
     player_3_id = Column(Integer, ForeignKey('players.id'), nullable=False)
@@ -64,7 +77,7 @@ class Team(Base):
     def __init__(self, team_array):
         from uuid import uuid4
 
-        self.id = uuid4()
+        self.id = str(uuid4())
 
         self.player_1_id = team_array[0].id
         self.player_2_id = team_array[1].id

@@ -1,8 +1,10 @@
 import logging
 import argparse
+import json
+import time
 
 from utils import logger_factory
-from apis import replays
+from apis import replays, stats
 
 
 def init_logging(verbose):
@@ -55,6 +57,8 @@ def run(args):
     logger = logging.getLogger(__name__)
     logger.info('Starting...')
 
+    conf = read_config(args.config)
+
     repo = get_database(args.database)
 
     matches = replays.get_replays(7100)
@@ -67,9 +71,13 @@ def run(args):
         if len(players) is not 6:
             continue
 
+        players_stats = stats.get_player_stats(players, conf['apis']['stats']['key'])
+
         team_0 = []
         team_1 = []
+        players_to_save = []
 
+        missing_player_stats = False
         for player in players:
             new_player = Player(player)
 
@@ -78,15 +86,30 @@ def run(args):
             else:
                 team_1.append(new_player)
 
-            db_team_0 = Team(team_0)
-            db_team_1 = Team(team_1)
+            if player['platform'] == '1':
+                new_player_stats = [s for s in players_stats if s['uniqueId'] == player['online_id']]
+            else:
+                new_player_stats = [s for s in players_stats if s['displayName'] == player['player_name']]
 
-            repo.save_team(db_team_0)
-            repo.save_team(db_team_1)
+            if len(new_player_stats) == 0:
+                missing_player_stats = True
+                break
+            else:
+                new_player.update_stats(new_player_stats[0]['stats'])
+                players_to_save.append(new_player)
 
-            repo.save_player(new_player)
+        if missing_player_stats:
+            continue
+        else:
+            for p in players_to_save:
+                repo.save_player(p)
 
+        db_team_0 = Team(team_0)
+        db_team_1 = Team(team_1)
 
+        repo.save_team(db_team_0)
+        repo.save_team(db_team_1)
+        time.sleep(conf['apis']['stats']['delay'])
 
 
 def parse_arguments():
@@ -102,8 +125,18 @@ def parse_arguments():
                         default='sqlite', help='Type of database to use.')
     parser.add_argument('-v', '--verbose', action='store_true', default=False,
                         help='Enable verbose logging to the console.')
+    parser.add_argument('-c', '--config', metavar='ConfigPath', type=str,
+                        default='config.json', help='Path to config json file.')
 
     return parser.parse_args()
+
+
+def read_config(path):
+    with open(path) as config:
+        conf_data = config.read()
+
+    conf = json.loads(conf_data)
+    return conf
 
 
 def main():

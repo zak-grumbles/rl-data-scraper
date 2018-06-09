@@ -6,7 +6,7 @@ import requests
 BASE_URL = 'https://api.rocketleaguestats.com/v1/player/batch'
 
 
-def get_players(players, key):
+def get_player_stats(players, key):
     """
     Gets the stats for a batch of rocket league players.
 
@@ -17,10 +17,10 @@ def get_players(players, key):
     headers = {'Authorization': key}
     payload = []
     for player in players:
-        if player.platform == '1':
-            payload.append({'platformId': player.platform, 'uniqueId': player.online_id})
+        if player['platform'] == '1':
+            payload.append({'platformId': player['platform'], 'uniqueId': player['online_id']})
         else:
-            payload.append({'platformId': player.platform, 'uniqueId': player.player_name})
+            payload.append({'platformId': player['platform'], 'uniqueId': player['player_name']})
 
     stats = requests.post(BASE_URL, headers=headers, json=payload)
     return stats.json()

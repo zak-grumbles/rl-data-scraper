@@ -1,5 +1,10 @@
-# rl-data-scraper (WIP. Not currently functional)
+# NOTICE: THIS PROJECT IS NO LONGER UNDER DEVELOPMENT
+Unfortunately, rocketleaguereplays.com shut down mid-development of this project so it cannot be completed. Leaving the source up here in case anyone is curious.
+
+## rl-data-scraper
 Python application that scrapes together a database of rocket league matches.
 
-## Branches
-The master branch is (ideally) stable. **Development has just started, so as of right now it is not functional.** If you want to see active development, check out dev or one of the other branches.
+## Data Sources
+This script pulls data from the following places:
+* [Rocket League Stats](https://rocketleaguestats.com)
+* [Rocket League Replays](https://rocketleaguereplays.com) - **No longer available**
